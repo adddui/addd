@@ -1,3 +1,5 @@
+// import axios from "./axios";
+
 refresh()
 
 function refresh() {
@@ -34,17 +36,20 @@ $("input[type='button']").on('click', function() {
             alert(data);
         }
     })
-})
+});
+
 
 var vm = new Vue({
     el: '#login',
     data: {
         username: '',
-        password: '',
+        origin_password: '',//原始密码
+        // password: hex_md5(this.origin_password),//第一次加密
         validateCode: '',
+        validateKey: localStorage.getItem("validateKey"),//取得用户标识
         login_status: '登录',
         user_id: '',
-        url: '', //这里存放请求的目标地址
+        url: 'toLogin', //这里存放请求的目标地址
     },
     methods: {
 
@@ -70,20 +75,25 @@ var vm = new Vue({
             // 检查输入
             if (this.check() === true) {
                 //登录
+                JSON.stringify(this.username);
+                JSON.stringify(this.password);
+                JSON.stringify(this.validateCode);
                 axios.post(this.url, {
                     username: this.username,
-                    password: this.password
-                }).then(res => function(res) {
-                    if (res.data.status == 'true') {
-                        this.login_status = '登陆成功！';
-                        // 将返回的数据存入
-                        sessionStorage.obj = JSON.stringify(res);
-                        window.location.href = "index.html";
-                    } else if (res.status.status == 1) {
-                        this.login_status = '用户名或密码错误！';
-                    } else if (res.data.status == 2) {
-                        this.login_status = '用户不存在！';
-                    }
+                    origin_password: this.origin_password,
+                    validateCode:this.validateCode,
+                }).then((res) => function(res) {
+                    console.log(res)
+                    // if (res.data.status == 'true') {
+                    //     this.login_status = '登陆成功！';
+                    //     // 将返回的数据存入
+                    //     sessionStorage.obj = JSON.stringify(res);
+                    //     window.location.href = "index.html";
+                    // } else if (res.status.status == 1) {
+                    //     this.login_status = '用户名或密码错误！';
+                    // } else if (res.data.status == 2) {
+                    //     this.login_status = '用户不存在！';
+                    // }
                 })
             }
         }
